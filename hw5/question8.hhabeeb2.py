@@ -18,16 +18,18 @@
     (1 / (n + 1)^2) / (v * (1 - cos(pi * n / (n + 1))) > 0.01
 
 
-    minima occurs when 
+    minima occurs when
         tan (pi * n / (2 * (n + 1))) = -(n + 1) / 4
 '''
 __author__ = 'Haroun Habeeb'
 __mail__ = 'hhabeeb2@illinois.edu'
 
+import pdb
 import numpy as np
 import scipy.sparse as sparse
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
-
+from matplotlib import cm
 
 
 def simulate(u0, f, v=0.05, dt=0.01, n=20, tmin=0.0, tmax=10.0):
@@ -49,27 +51,98 @@ def simulate(u0, f, v=0.05, dt=0.01, n=20, tmin=0.0, tmax=10.0):
         -----
             us: list of values of u at time steps
             ts: list of time steps
+            xs: list of grid points
     '''
-    L = sparse.diags([-1, 2, -1], [-1, 0, 1], shape=(n, n))
+    # pdb.set_trace()
     dx = 1.0 / (n + 1)
+    L = -v * ((n + 1)**2) * sparse.diags([-1, 2, -1], [-1, 0, 1], shape=(n, n))
+    xs = np.array(list(range(n))) * dx
     k = np.array(range(1, n + 1))
     lambda_k = - 2 * v * (1 - np.cos(np.pi * k * dx)) / (dx**2)
     dt_max = (-2.0 / lambda_k).min()
-    print('Maximum allowed dt=', dt_max)
+    # print('Maximum allowed dt=', dt_max)
     us = [u0]
     ts = [tmin]
     t = tmin
-    while t <= tmax:
-        us.append(us[-1] + dt * L @ us[-1] + f(t, us[-1]))
+    while t < tmax:  # simulation until t is complete.
+        us.append(us[-1] + dt * ((L @ us[-1]) + f(t, us[-1])))
         t += dt
-    return us, ts
+        ts.append(t)
+    return us, ts, xs
 
 
-f = lambda t, y: np.zeros((n,))
+def f(t, y):
+    return np.ones((len(y),))
+
+
 n = 20
 v = 0.05
 tmin = 0.0
 tmax = 10.0
 
-us, ts = simulate(np.zeros((n,)), f)
+us, ts, xs = simulate(np.zeros((n,)), f, tmin=tmin, tmax=tmax, n=n)
+us = np.array(us)
+un20t10 = us[-1]
+plt.figure(1)
+plt.plot(xs, us[0], 'r-', label='At t=0')
+plt.plot(xs, us[len(us) // 2], 'c-', label='At t=' + str(ts[len(us) // 2]))
+plt.plot(xs, us[-1], 'y-', label='At t=10.0')
+plt.xlabel('x')
+plt.ylabel('u')
+plt.legend(loc='best')
+plt.title('u vs x for n=' + str(n))
+ylims = plt.ylim()
 
+
+n = 40
+v = 0.05
+tmin = 0.0
+tmax = 1.0
+
+us, ts, xs = simulate(np.zeros((n,)), f, tmin=tmin, tmax=tmax, n=n)
+us = np.array(us)
+un40t10 = us[-1]
+
+
+# for n=30, n=31
+n = 30
+v = 0.05
+tmin = 0.0
+tmax = 10.0
+
+us, ts, xs = simulate(np.zeros((n,)), f, tmin=tmin, tmax=tmax, n=n)
+us = np.array(us)
+plt.figure(2)
+plt.plot(xs, us[0], 'r-', label='At t=0 n=30')
+plt.plot(xs, us[len(us) // 2], 'c-', label='At t=' + str(ts[len(us) // 2]) + ' n=30')
+plt.plot(xs, us[-1], 'y-', label='At t=10.0 n=30')
+# plt.xlabel('x')
+# plt.ylabel('u')
+# plt.ylim(ylims)
+# plt.legend(loc='best')
+# plt.title('u vs x for n=30,31')
+
+# for n = 31
+n = 31
+v = 0.05
+tmin = 0.0
+tmax = 10.0
+
+us, ts, xs = simulate(np.zeros((n,)), f, tmin=tmin, tmax=tmax, n=n)
+us = np.array(us)
+
+plt.plot(xs, us[0], 'r--', label='At t=0 n=31')
+plt.plot(xs, us[len(us) // 2], 'c--', label='At t=' + str(ts[len(us) // 2]) + ' n=31')
+plt.plot(xs, us[-1], 'y--', label='At t=10.0 n=31')
+plt.xlabel('x')
+plt.ylabel('u')
+plt.ylim(ylims)
+plt.legend(loc='best')
+plt.title('u vs x for n=30,31')
+
+
+print('n=20 : ||u(t=10)||_{\\infty}=', np.linalg.norm(un20t10, ord=np.inf))
+print('n=40 : ||u(t=10)||_{\\infty}=', np.linalg.norm(un40t10, ord=np.inf))
+print('When we set n=40, the infinity norm of $$u$$ increases from 2.4 to 1.07e32. It is no longer stable.')
+print('n=30 is the largest permissible value. when v=0.05 and dt=0.01')
+# plt.show()

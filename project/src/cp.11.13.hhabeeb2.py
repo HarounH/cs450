@@ -92,7 +92,7 @@ if __name__ == '__main__':
     # Plot error vs iteration
     fig = plt.figure(1)
     for i in range(len(ks)):
-        pdb.set_trace()
+        # pdb.set_trace()
         k = ks[i]
         plt.plot(range(len(gs_errors[i])),
                  [np.linalg.norm(e) for e in gs_errors[i]],
@@ -116,5 +116,13 @@ if __name__ == '__main__':
     plt.xlabel('iteration')
     plt.ylabel('||error||')
     plt.savefig('../cp.11.13.jacobi.png')
+    pdb.set_trace()
+    # fig = plt.figure(3)
+    # plt.subplot(231)
+    # for k <= 25
+    # for j in range(len(gs_errors[0]))
+    # plt.plot(range(len(gs_errors[0])), gs_errors[0])
+    # fig = plt.figure(4)
+    # plt.subplot(231)
+    # for k >= 25
     plt.show()
-
