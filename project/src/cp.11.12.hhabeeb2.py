@@ -11,10 +11,12 @@ __mail__ = 'hhabeeb2@illinois.edu'
 
 import pdb
 import numpy as np
+import scipy.sparse as sp
 import time
 import matplotlib.pyplot as plt
 from matrix_generator import generate_matrix, condition_matrix
-MAX_ITER = 15
+from matrix_generator import define_poisson_system, define_heat
+MAX_ITER = 100
 
 
 def cg(A, b, x0, max_iter=MAX_ITER, eps=10**-6):
@@ -120,6 +122,17 @@ if __name__ == '__main__':
     x0s.append(np.random.rand(4))
     names.append('4x4-ill-conditioned')
 
+
+    # large system
+    names.append('poisson.n20')
+    define_poisson_system(As, bs, x0s, n=20)
+
+    # names.append('poisson.n50')
+    # define_poisson_system(As, bs, x0s, n=50)
+
+    names.append('heat.a0.1.n   20')
+    define_heat(As, bs, x0s, a=0.1, n=20)
+
     for i in range(0, len(As)):
         A = As[i]
         b = bs[i]
@@ -129,22 +142,22 @@ if __name__ == '__main__':
         sd_data = Data()
         cg_data.x, cg_data.xs, cg_data.rs, cg_data.time = cg(A, b, x0)
         sd_data.x, sd_data.xs, sd_data.rs, sd_data.time = sd(A, b, x0)
-        pdb.set_trace()
+        # pdb.set_trace()
         # Plot stuff
         fig = plt.figure(i)
 
         # plots
-        plt.plot(list(range(0, len(cg_data.xs))),
+        plt.semilogy(list(range(0, len(cg_data.xs))),
                  [np.linalg.norm(r) for r in cg_data.rs],
                  'r-',
                  label='conjugate: ' + str(cg_data.time))
-        plt.plot(list(range(0, len(sd_data.xs))),
+        plt.semilogy(list(range(0, len(sd_data.xs))),
                  [np.linalg.norm(r) for r in sd_data.rs],
                  'b-',
                  label='steepest: ' + str(sd_data.time))
         plt.title(name)
-        plt.ylabel('norm(r)')
+        plt.ylabel('log(norm(r))')
         plt.xlabel('iteration')
         plt.legend(loc='best')
         plt.savefig('../cp.11.12.' + name + '.png')
-    plt.show()
+    # plt.show()

@@ -94,27 +94,27 @@ if __name__ == '__main__':
     for i in range(len(ks)):
         # pdb.set_trace()
         k = ks[i]
-        plt.plot(range(len(gs_errors[i])),
+        plt.semilogy(range(len(gs_errors[i])),
                  [np.linalg.norm(e) for e in gs_errors[i]],
                  lineparams[i],
                  label='GS k=' + str(k))
     plt.legend(loc='best')
     plt.title('Gauss Siedel')
     plt.xlabel('iteration')
-    plt.ylabel('||error||')
+    plt.ylabel('log(||error||)')
     plt.savefig('../cp.11.13.gauss-siedel.png')
 
     fig = plt.figure(2)
     for i in range(len(ks)):
         k = ks[i]
-        plt.plot(range(len(jacobi_errors[i])),
+        plt.semilogy(range(len(jacobi_errors[i])),
                  [np.linalg.norm(e) for e in jacobi_errors[i]],
                  lineparams[i],
                  label='jacobi k=' + str(k))
     plt.legend(loc='best')
     plt.title('Jacobi')
     plt.xlabel('iteration')
-    plt.ylabel('||error||')
+    plt.ylabel('log(||error||)')
     plt.savefig('../cp.11.13.jacobi.png')
     pdb.set_trace()
     # fig = plt.figure(3)

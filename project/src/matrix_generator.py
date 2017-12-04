@@ -1,5 +1,47 @@
 import numpy as np
+import scipy.sparse as sp
 
+
+def define_poisson_system(As, bs, x0s, n=20):
+    A = sp.diags([1, 1, 1, 1, 1, 1, -6.0], [1, -1, -n, n, -n**2, n**2, 0], shape=(n**3, n**3))
+    As.append(A)
+    bs.append((n**-2) * np.random.rand(n**3))
+    x0s.append(np.random.rand(n**3))
+
+
+def define_heat(As, bs, x0s, a=0.1, n=20):
+    sz = n**3
+    n2 = n**2
+    A = sp.csr_matrix((sz, sz), dtype=float)
+    b = np.zeros(sz)
+    for w in range(sz):
+        i = w / n2
+        j = (w % n2) / n
+        k = w % n
+        if k == 0:
+            A[w, w] = 1
+            b[w] = np.random.rand()
+        elif i == 0 or j == 0:
+            A[w, w] = 1
+        elif i == (n - 1) or j == (n - 1):
+            A[w, w] = 1
+        else:
+            if (w + 1) < sz:
+                A[w, w + 1] = 1 / (2 * a * n)
+            if (w - 1) > 0:
+                A[w, w - 1] = -1 / (2 * a * n)
+            if (w + n) < sz:
+                A[w, w + n] = 1
+            if (w - n) > 0:
+                A[w, w - n] = 1
+            if (w + n2) < sz:
+                A[w, w + n2] = 1
+            if (w - n2) > 0:
+                A[w, w - n2] = 1
+            A[w, w] = -4
+    As.append(A)
+    bs.append(b)
+    x0s.append(np.random.rand(sz))
 
 def generate_matrix(sz):
     '''
