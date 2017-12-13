@@ -1,15 +1,24 @@
+'''
+    Utility functions for other computer problems.
+'''
+__author__ = 'Haroun Habeeb'
+__mail__ = 'hhabeeb2@illinois.edu'
+
 import numpy as np
+import scipy.sparse.linalg as spla
 import scipy.sparse as sp
+import pdb
 
-
-def define_poisson_system(As, bs, x0s, n=20):
+def define_poisson_system(As, bs, x0s, n=20, analyze=False):
     A = sp.diags([1, 1, 1, 1, 1, 1, -6.0], [1, -1, -n, n, -n**2, n**2, 0], shape=(n**3, n**3))
     As.append(A)
     bs.append((n**-2) * np.random.rand(n**3))
     x0s.append(np.random.rand(n**3))
+    if analyze:
+        pdb.set_trace()
 
 
-def define_heat(As, bs, x0s, a=0.1, n=20):
+def define_heat(As, bs, x0s, a=0.1, n=20, analyze=False):
     sz = n**3
     n2 = n**2
     A = sp.csr_matrix((sz, sz), dtype=float)
@@ -42,6 +51,8 @@ def define_heat(As, bs, x0s, a=0.1, n=20):
     As.append(A)
     bs.append(b)
     x0s.append(np.random.rand(sz))
+    if analyze:
+        pdb.set_trace()
 
 def generate_matrix(sz):
     '''
@@ -75,3 +86,7 @@ def condition_matrix(A, c):
     lambdan = eigs[-1]
     sqrtc = np.sqrt(c)
     return A + np.eye(n) * (lambda1 - sqrtc * lambdan) / (sqrtc - 1)
+
+
+if __name__ == '__main__':
+    define_heat([], [], [], n=4, analyze=True)

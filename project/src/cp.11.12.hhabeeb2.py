@@ -122,10 +122,11 @@ if __name__ == '__main__':
     x0s.append(np.random.rand(4))
     names.append('4x4-ill-conditioned')
 
-
     # large system
     names.append('poisson.n20')
     define_poisson_system(As, bs, x0s, n=20)
+
+
 
     # names.append('poisson.n50')
     # define_poisson_system(As, bs, x0s, n=50)
@@ -133,6 +134,12 @@ if __name__ == '__main__':
     names.append('heat.a0.1.n   20')
     define_heat(As, bs, x0s, a=0.1, n=20)
 
+
+    # curiosity
+    names.append('poisson.n30')
+    define_poisson_system(As, bs, x0s, n=30)
+
+    pdb.set_trace()
     for i in range(0, len(As)):
         A = As[i]
         b = bs[i]
@@ -140,8 +147,12 @@ if __name__ == '__main__':
         name = names[i]
         cg_data = Data()
         sd_data = Data()
-        cg_data.x, cg_data.xs, cg_data.rs, cg_data.time = cg(A, b, x0)
-        sd_data.x, sd_data.xs, sd_data.rs, sd_data.time = sd(A, b, x0)
+        if i == len(As) - 1:
+            cg_data.x, cg_data.xs, cg_data.rs, cg_data.time = cg(A, b, x0, max_iter=200)
+            sd_data.x, sd_data.xs, sd_data.rs, sd_data.time = sd(A, b, x0, max_iter=200)
+        else:
+            cg_data.x, cg_data.xs, cg_data.rs, cg_data.time = cg(A, b, x0)
+            sd_data.x, sd_data.xs, sd_data.rs, sd_data.time = sd(A, b, x0)
         # pdb.set_trace()
         # Plot stuff
         fig = plt.figure(i)
